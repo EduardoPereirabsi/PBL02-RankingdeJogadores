@@ -4,11 +4,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Painel personalizado que desenha a Árvore Binária de Busca graficamente.
- * Usa posicionamento baseado no percurso In-Order para evitar sobreposição de nós.
- * Nós são coloridos de acordo com a faixa de ranking.
- */
 public class TreePanel extends JPanel {
     private final BinarySearchTree bst;
     private int highlightRanking = -1;
@@ -21,7 +16,6 @@ public class TreePanel extends JPanel {
     private static final int TOP_MARGIN = 40;
     private static final int LEFT_MARGIN = 20;
 
-    // Cores por faixa de ranking
     private static final Color TOP_10_COLOR  = new Color(220, 50, 50);
     private static final Color TOP_25_COLOR  = new Color(230, 140, 20);
     private static final Color TOP_50_COLOR  = new Color(40, 140, 210);
@@ -36,27 +30,23 @@ public class TreePanel extends JPanel {
         setBackground(BG_COLOR);
     }
 
-    /** Destaca o nó com o ranking informado. */
     public void setHighlight(int ranking) {
         highlightRanking = ranking;
         revalidate();
         repaint();
     }
 
-    /** Remove o destaque. */
     public void clearHighlight() {
         highlightRanking = -1;
         revalidate();
         repaint();
     }
 
-    /** Atualiza a visualização da árvore. */
     public void refresh() {
         revalidate();
         repaint();
     }
 
-    // Calcula posição (x, y) de cada nó usando percurso In-Order
     private void computePositions() {
         positions.clear();
         if (bst.getRoot() == null) return;
@@ -102,15 +92,12 @@ public class TreePanel extends JPanel {
             return;
         }
 
-        // Desenha arestas primeiro (ficam atrás dos nós)
         drawEdges(g2, bst.getRoot());
 
-        // Desenha os nós por cima
         for (Map.Entry<Node, Point> entry : positions.entrySet()) {
             drawNode(g2, entry.getKey(), entry.getValue());
         }
 
-        // Legenda de cores
         drawLegend(g2);
     }
 
@@ -146,16 +133,13 @@ public class TreePanel extends JPanel {
         int x = pos.x - NODE_W / 2;
         int y = pos.y;
 
-        // Sombra
         g2.setColor(new Color(0, 0, 0, 50));
         g2.fill(new RoundRectangle2D.Float(x + 3, y + 3, NODE_W, NODE_H, 14, 14));
 
-        // Corpo do nó
         RoundRectangle2D rect = new RoundRectangle2D.Float(x, y, NODE_W, NODE_H, 14, 14);
         g2.setColor(fill);
         g2.fill(rect);
 
-        // Borda
         if (hl) {
             g2.setColor(new Color(200, 170, 0));
             g2.setStroke(new BasicStroke(3f));
@@ -165,14 +149,12 @@ public class TreePanel extends JPanel {
         }
         g2.draw(rect);
 
-        // Texto do ranking
         g2.setColor(hl ? Color.BLACK : Color.WHITE);
         g2.setFont(new Font("SansSerif", Font.BOLD, 12));
         String rankStr = "#" + node.player.getRanking();
         FontMetrics fm = g2.getFontMetrics();
         g2.drawString(rankStr, pos.x - fm.stringWidth(rankStr) / 2, y + 16);
 
-        // Texto do nickname
         g2.setFont(new Font("SansSerif", Font.PLAIN, 9));
         fm = g2.getFontMetrics();
         String nick = node.player.getNickname();

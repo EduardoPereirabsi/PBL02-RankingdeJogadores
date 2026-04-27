@@ -4,11 +4,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.List;
 
-/**
- * Interface gráfica principal do sistema de Ranking de Jogadores.
- * Permite inserir, remover, buscar jogadores, carregar CSV
- * e visualizar a árvore binária de busca e seus percursos.
- */
 public class RankingGUI extends JFrame {
     private final BinarySearchTree bst;
     private final TreePanel treePanel;
@@ -20,19 +15,16 @@ public class RankingGUI extends JFrame {
     public RankingGUI() {
         bst = new BinarySearchTree();
 
-        // ===== Configuração da janela =====
         setTitle("Ranking de Jogadores \u2014 \u00c1rvore Bin\u00e1ria de Busca");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1200, 800);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(5, 5));
 
-        // ===== Painel superior: controles =====
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBorder(new EmptyBorder(8, 10, 4, 10));
 
-        // Linha 1: campos de entrada + inserir/remover
         JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         row1.add(new JLabel("Nickname:"));
         nicknameField = new JTextField(14);
@@ -46,7 +38,6 @@ public class RankingGUI extends JFrame {
         row1.add(insertBtn);
         row1.add(removeBtn);
 
-        // Linha 2: buscar + ações
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         JButton searchRankBtn = createButton("Buscar Ranking", new Color(21, 101, 192));
         JButton searchNameBtn = createButton("Buscar Nome", new Color(21, 101, 192));
@@ -57,7 +48,6 @@ public class RankingGUI extends JFrame {
         row2.add(loadCsvBtn);
         row2.add(clearBtn);
 
-        // Linha 3: percursos + estatísticas
         JPanel row3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         JButton inOrderBtn    = createButton("In-Order", new Color(106, 27, 154));
         JButton preOrderBtn   = createButton("Pr\u00e9-Order", new Color(106, 27, 154));
@@ -79,7 +69,6 @@ public class RankingGUI extends JFrame {
         topPanel.add(row3);
         add(topPanel, BorderLayout.NORTH);
 
-        // ===== Centro: visualização da árvore =====
         treePanel = new TreePanel(bst);
         JScrollPane treeScroll = new JScrollPane(treePanel);
         treeScroll.setBorder(BorderFactory.createTitledBorder(
@@ -91,7 +80,6 @@ public class RankingGUI extends JFrame {
         treeScroll.getHorizontalScrollBar().setUnitIncrement(16);
         add(treeScroll, BorderLayout.CENTER);
 
-        // ===== Inferior: área de saída =====
         outputArea = new JTextArea(8, 80);
         outputArea.setEditable(false);
         outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -101,7 +89,6 @@ public class RankingGUI extends JFrame {
         outputScroll.setPreferredSize(new Dimension(0, 180));
         add(outputScroll, BorderLayout.SOUTH);
 
-        // ===== Listeners =====
         insertBtn.addActionListener(e -> doInsert());
         removeBtn.addActionListener(e -> doRemove());
         searchRankBtn.addActionListener(e -> doSearchByRanking());
@@ -113,7 +100,6 @@ public class RankingGUI extends JFrame {
         postOrderBtn.addActionListener(e -> showTraversal("P\u00f3s-Order", bst.postOrder()));
         levelOrderBtn.addActionListener(e -> showTraversal("Level-Order", bst.levelOrder()));
 
-        // Enter no campo ranking insere o jogador
         rankingField.addActionListener(e -> doInsert());
 
         updateStats();
@@ -131,8 +117,6 @@ public class RankingGUI extends JFrame {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
-
-    // ==================== AÇÕES ====================
 
     private void doInsert() {
         String nick = nicknameField.getText().trim();
@@ -195,7 +179,6 @@ public class RankingGUI extends JFrame {
                 log("[BUSCA] Encontrado: " + found);
                 treePanel.setHighlight(rank);
 
-                // Mostra o caminho percorrido na busca
                 List<Player> path = bst.getSearchPath(rank);
                 StringBuilder sb = new StringBuilder("   Caminho: ");
                 for (int i = 0; i < path.size(); i++) {
@@ -236,7 +219,7 @@ public class RankingGUI extends JFrame {
 
         File file = fc.getSelectedFile();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line = br.readLine(); // pula cabeçalho
+            String line = br.readLine();
             int count = 0;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
@@ -277,8 +260,6 @@ public class RankingGUI extends JFrame {
         }
         log(sb.toString());
     }
-
-    // ==================== UTILITÁRIOS ====================
 
     private void refreshTree() {
         treePanel.refresh();

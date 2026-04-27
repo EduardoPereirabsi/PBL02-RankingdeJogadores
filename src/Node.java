@@ -1,7 +1,3 @@
-/**
- * Nó da Árvore Binária de Busca.
- * Armazena um jogador e referências para os filhos esquerdo e direito.
- */
 public class Node {
     Player player;
     Node left;

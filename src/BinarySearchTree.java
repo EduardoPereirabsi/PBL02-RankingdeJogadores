@@ -3,11 +3,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-/**
- * Árvore Binária de Busca (BST) para o ranking de jogadores.
- * Chave de ordenação: ranking do jogador (int).
- * Valores menores vão para a esquerda, maiores para a direita.
- */
 public class BinarySearchTree {
     private Node root;
     private int size;
@@ -17,11 +12,6 @@ public class BinarySearchTree {
         size = 0;
     }
 
-    // ==================== INSERÇÃO ====================
-
-    /**
-     * Insere um jogador na árvore. Não permite rankings duplicados.
-     */
     public boolean insert(Player player) {
         if (search(player.getRanking()) != null) return false;
         root = insertRec(root, player);
@@ -40,12 +30,6 @@ public class BinarySearchTree {
         return node;
     }
 
-    // ==================== REMOÇÃO ====================
-
-    /**
-     * Remove o jogador com o ranking especificado.
-     * Retorna true se removido, false se não encontrado.
-     */
     public boolean remove(int ranking) {
         if (search(ranking) == null) return false;
         root = removeRec(root, ranking);
@@ -61,11 +45,9 @@ public class BinarySearchTree {
         } else if (ranking > node.player.getRanking()) {
             node.right = removeRec(node.right, ranking);
         } else {
-            // Caso 1: nó folha ou com um único filho
             if (node.left == null) return node.right;
             if (node.right == null) return node.left;
 
-            // Caso 2: nó com dois filhos — substitui pelo sucessor in-order
             Node successor = findMinNode(node.right);
             node.player = successor.player;
             node.right = removeRec(node.right, successor.player.getRanking());
@@ -78,9 +60,6 @@ public class BinarySearchTree {
         return node;
     }
 
-    // ==================== BUSCA ====================
-
-    /** Busca jogador por ranking. Retorna null se não encontrado. */
     public Player search(int ranking) {
         Node result = searchRec(root, ranking);
         return result != null ? result.player : null;
@@ -93,7 +72,6 @@ public class BinarySearchTree {
         return searchRec(node.right, ranking);
     }
 
-    /** Busca jogador por nickname (busca completa na árvore). */
     public Player searchByNickname(String nickname) {
         return searchByNicknameRec(root, nickname);
     }
@@ -106,7 +84,6 @@ public class BinarySearchTree {
         return searchByNicknameRec(node.right, nickname);
     }
 
-    /** Retorna o caminho de busca da raiz até o nó com o ranking dado. */
     public List<Player> getSearchPath(int ranking) {
         List<Player> path = new ArrayList<>();
         searchPath(root, ranking, path);
@@ -121,9 +98,6 @@ public class BinarySearchTree {
         return searchPath(node.right, ranking, path);
     }
 
-    // ==================== PERCURSOS (TRAVERSALS) ====================
-
-    /** Percurso Em Ordem (esquerda → raiz → direita) — retorna ranking ordenado. */
     public List<Player> inOrder() {
         List<Player> result = new ArrayList<>();
         inOrderRec(root, result);
@@ -137,7 +111,6 @@ public class BinarySearchTree {
         inOrderRec(node.right, result);
     }
 
-    /** Percurso Pré-Ordem (raiz → esquerda → direita). */
     public List<Player> preOrder() {
         List<Player> result = new ArrayList<>();
         preOrderRec(root, result);
@@ -151,7 +124,6 @@ public class BinarySearchTree {
         preOrderRec(node.right, result);
     }
 
-    /** Percurso Pós-Ordem (esquerda → direita → raiz). */
     public List<Player> postOrder() {
         List<Player> result = new ArrayList<>();
         postOrderRec(root, result);
@@ -165,7 +137,6 @@ public class BinarySearchTree {
         result.add(node.player);
     }
 
-    /** Percurso em Nível (BFS — Breadth-First Search). */
     public List<Player> levelOrder() {
         List<Player> result = new ArrayList<>();
         if (root == null) return result;
@@ -180,9 +151,6 @@ public class BinarySearchTree {
         return result;
     }
 
-    // ==================== INFORMAÇÕES DA ÁRVORE ====================
-
-    /** Retorna a altura da árvore (0 se vazia). */
     public int getHeight() {
         return getHeightRec(root);
     }
@@ -192,16 +160,13 @@ public class BinarySearchTree {
         return 1 + Math.max(getHeightRec(node.left), getHeightRec(node.right));
     }
 
-    /** Retorna o número de nós na árvore. */
     public int getSize() { return size; }
 
-    /** Retorna o jogador com menor ranking (melhor posição). */
     public Player getMin() {
         if (root == null) return null;
         return findMinNode(root).player;
     }
 
-    /** Retorna o jogador com maior ranking (pior posição). */
     public Player getMax() {
         if (root == null) return null;
         Node node = root;
@@ -209,10 +174,8 @@ public class BinarySearchTree {
         return node.player;
     }
 
-    /** Retorna a raiz da árvore. */
     public Node getRoot() { return root; }
 
-    /** Limpa toda a árvore. */
     public void clear() {
         root = null;
         size = 0;

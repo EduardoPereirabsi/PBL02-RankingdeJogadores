@@ -4,9 +4,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.List;
 
-// Tela principal do sistema de ranking
-// Adaptado do TreeVisualizer.java - em vez de JavaFX usa Swing
-// Tem os botoes pra inserir, remover, buscar, carregar csv e ver os percursos
 public class InterfaceRanking extends JFrame {
     private ArvoreBinaria arvore;
     private PainelArvore painelArvore;
@@ -27,12 +24,10 @@ public class InterfaceRanking extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(5, 5));
 
-        // ---- painel de cima com os controles ----
         JPanel painelControles = new JPanel();
         painelControles.setLayout(new BoxLayout(painelControles, BoxLayout.Y_AXIS));
         painelControles.setBorder(new EmptyBorder(8, 10, 4, 10));
 
-        // linha 1: campos de texto e botoes inserir/remover
         JPanel linha1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         linha1.add(new JLabel("Nickname:"));
         campoNickname = new JTextField(14);
@@ -46,7 +41,6 @@ public class InterfaceRanking extends JFrame {
         linha1.add(btnInserir);
         linha1.add(btnRemover);
 
-        // linha 2: buscar e acoes
         JPanel linha2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         JButton btnBuscarRank = criarBotao("Buscar Ranking", new Color(21, 101, 192));
         JButton btnBuscarNome = criarBotao("Buscar Nickname", new Color(21, 101, 192));
@@ -57,7 +51,6 @@ public class InterfaceRanking extends JFrame {
         linha2.add(btnCarregarCsv);
         linha2.add(btnLimpar);
 
-        // linha 3: percursos e estatisticas
         JPanel linha3 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
         JButton btnEmOrdem = criarBotao("Em Ordem", new Color(106, 27, 154));
         JButton btnPreOrdem = criarBotao("Pre-Ordem", new Color(106, 27, 154));
@@ -79,7 +72,6 @@ public class InterfaceRanking extends JFrame {
         painelControles.add(linha3);
         add(painelControles, BorderLayout.NORTH);
 
-        // ---- centro: desenho da arvore ----
         painelArvore = new PainelArvore(arvore);
         JScrollPane scrollArvore = new JScrollPane(painelArvore);
         scrollArvore.setBorder(BorderFactory.createTitledBorder(
@@ -91,7 +83,6 @@ public class InterfaceRanking extends JFrame {
         scrollArvore.getHorizontalScrollBar().setUnitIncrement(16);
         add(scrollArvore, BorderLayout.CENTER);
 
-        // ---- parte de baixo: area de saida ----
         areaSaida = new JTextArea(8, 80);
         areaSaida.setEditable(false);
         areaSaida.setFont(new Font("Monospaced", Font.PLAIN, 12));
@@ -101,7 +92,6 @@ public class InterfaceRanking extends JFrame {
         scrollSaida.setPreferredSize(new Dimension(0, 180));
         add(scrollSaida, BorderLayout.SOUTH);
 
-        // ---- acoes dos botoes ----
         btnInserir.addActionListener(e -> acaoInserir());
         btnRemover.addActionListener(e -> acaoRemover());
         btnBuscarRank.addActionListener(e -> acaoBuscarPorRanking());
@@ -113,14 +103,12 @@ public class InterfaceRanking extends JFrame {
         btnPosOrdem.addActionListener(e -> mostrarPercurso("Pos-Ordem", arvore.posOrdem()));
         btnEmNivel.addActionListener(e -> mostrarPercurso("Em Nivel", arvore.emNivel()));
 
-        // apertar enter no campo ranking ja insere
         campoRanking.addActionListener(e -> acaoInserir());
 
         atualizarEstatisticas();
         escreverSaida("Sistema iniciado. Carregue o CSV ou insira jogadores manualmente.");
     }
 
-    // cria um botao com cor customizada
     private JButton criarBotao(String texto, Color cor) {
         JButton btn = new JButton(texto);
         btn.setBackground(cor);
@@ -132,8 +120,6 @@ public class InterfaceRanking extends JFrame {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
-
-    // ========== ACOES ==========
 
     private void acaoInserir() {
         String nickname = campoNickname.getText().trim();
@@ -205,7 +191,6 @@ public class InterfaceRanking extends JFrame {
                 escreverSaida("[BUSCA] Encontrado: " + encontrado);
                 painelArvore.destacar(rank);
 
-                // mostra o caminho que percorreu na arvore
                 List<Jogador> caminho = arvore.getCaminhoBusca(rank);
                 StringBuilder sb = new StringBuilder("   Caminho: ");
                 for (int i = 0; i < caminho.size(); i++) {
@@ -253,7 +238,7 @@ public class InterfaceRanking extends JFrame {
 
         File arquivo = seletorArquivo.getSelectedFile();
         try (BufferedReader leitor = new BufferedReader(new FileReader(arquivo))) {
-            String linha = leitor.readLine(); // pula o cabecalho (nickname,ranking)
+            String linha = leitor.readLine();
             int quantidade = 0;
 
             while ((linha = leitor.readLine()) != null) {
@@ -299,8 +284,6 @@ public class InterfaceRanking extends JFrame {
         }
         escreverSaida(sb.toString());
     }
-
-    // ========== AUXILIARES ==========
 
     private void atualizarTela() {
         painelArvore.atualizar();

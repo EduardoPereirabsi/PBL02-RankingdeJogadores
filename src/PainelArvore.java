@@ -4,16 +4,11 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.HashMap;
 import java.util.Map;
 
-// Painel que desenha a arvore binaria na tela
-// Baseado no drawTree e drawNode do TreeVisualizer.java da professora
-// Adaptado de JavaFX (Canvas/GraphicsContext) para Swing (JPanel/Graphics2D)
-// Em vez de desenhar circulos com letras morse, desenha retangulos com nickname e ranking
 public class PainelArvore extends JPanel {
     private ArvoreBinaria arvore;
     private int rankingDestacado = -1;
     private Map<No, Point> posicoes = new HashMap<>();
 
-    // tamanhos dos nos e espacamento
     private static final int LARGURA_NO = 92;
     private static final int ALTURA_NO = 42;
     private static final int ESPACO_H = 10;
@@ -21,7 +16,6 @@ public class PainelArvore extends JPanel {
     private static final int MARGEM_TOPO = 40;
     private static final int MARGEM_ESQ = 20;
 
-    // cores das faixas de ranking
     private static final Color COR_TOP10 = new Color(220, 50, 50);
     private static final Color COR_TOP25 = new Color(230, 140, 20);
     private static final Color COR_TOP50 = new Color(40, 140, 210);
@@ -36,27 +30,23 @@ public class PainelArvore extends JPanel {
         setBackground(COR_FUNDO);
     }
 
-    // destaca um no especifico na arvore
     public void destacar(int ranking) {
         rankingDestacado = ranking;
         revalidate();
         repaint();
     }
 
-    // tira o destaque
     public void limparDestaque() {
         rankingDestacado = -1;
         revalidate();
         repaint();
     }
 
-    // atualiza o desenho
     public void atualizar() {
         revalidate();
         repaint();
     }
 
-    // calcula onde cada no vai ficar na tela usando percurso em ordem
     private void calcularPosicoes() {
         posicoes.clear();
         if (arvore.getRoot() == null) return;
@@ -109,21 +99,15 @@ public class PainelArvore extends JPanel {
             return;
         }
 
-        // primeiro desenha as linhas (ficam atras dos nos)
-        // mesma ideia do drawNode do TreeVisualizer que desenha strokeLine entre pai e filhos
         desenharLinhas(g2, arvore.getRoot());
 
-        // depois desenha os nos por cima
         for (Map.Entry<No, Point> entrada : posicoes.entrySet()) {
             desenharNo(g2, entrada.getKey(), entrada.getValue());
         }
 
-        // legenda das cores
         desenharLegenda(g2);
     }
 
-    // desenha as linhas conectando pai e filhos
-    // no TreeVisualizer era: gc.strokeLine(x, y + 15, newX, newY - 15)
     private void desenharLinhas(Graphics2D g2, No node) {
         if (node == null) return;
         Point posicaoPai = posicoes.get(node);
@@ -150,9 +134,6 @@ public class PainelArvore extends JPanel {
         }
     }
 
-    // desenha um no individual com ranking e nickname
-    // no TreeVisualizer original desenhava circulo com strokeOval e letra com strokeText
-    // aqui usa retangulo arredondado e mostra ranking + nickname
     private void desenharNo(Graphics2D g2, No node, Point pos) {
         boolean destacado = node.jogador.getRanking() == rankingDestacado;
         Color corNo = pegarCorDoNo(node.jogador.getRanking(), destacado);
@@ -160,16 +141,13 @@ public class PainelArvore extends JPanel {
         int x = pos.x - LARGURA_NO / 2;
         int y = pos.y;
 
-        // sombra
         g2.setColor(new Color(0, 0, 0, 50));
         g2.fill(new RoundRectangle2D.Float(x + 3, y + 3, LARGURA_NO, ALTURA_NO, 14, 14));
 
-        // retangulo do no
         RoundRectangle2D retangulo = new RoundRectangle2D.Float(x, y, LARGURA_NO, ALTURA_NO, 14, 14);
         g2.setColor(corNo);
         g2.fill(retangulo);
 
-        // borda
         if (destacado) {
             g2.setColor(new Color(200, 170, 0));
             g2.setStroke(new BasicStroke(3f));
@@ -179,18 +157,15 @@ public class PainelArvore extends JPanel {
         }
         g2.draw(retangulo);
 
-        // texto do ranking
         g2.setColor(destacado ? Color.BLACK : Color.WHITE);
         g2.setFont(new Font("SansSerif", Font.BOLD, 12));
         String textoRank = "#" + node.jogador.getRanking();
         FontMetrics fm = g2.getFontMetrics();
         g2.drawString(textoRank, pos.x - fm.stringWidth(textoRank) / 2, y + 16);
 
-        // texto do nickname
         g2.setFont(new Font("SansSerif", Font.PLAIN, 9));
         fm = g2.getFontMetrics();
         String nickname = node.jogador.getNickname();
-        // se o nickname for muito grande, corta
         if (fm.stringWidth(nickname) > LARGURA_NO - 8) {
             while (nickname.length() > 3 && fm.stringWidth(nickname + "..") > LARGURA_NO - 8) {
                 nickname = nickname.substring(0, nickname.length() - 1);
@@ -200,7 +175,6 @@ public class PainelArvore extends JPanel {
         g2.drawString(nickname, pos.x - fm.stringWidth(nickname) / 2, y + 32);
     }
 
-    // retorna a cor do no baseado na faixa de ranking
     private Color pegarCorDoNo(int ranking, boolean destacado) {
         if (destacado) return COR_DESTAQUE;
         if (ranking <= 10) return COR_TOP10;
@@ -210,7 +184,6 @@ public class PainelArvore extends JPanel {
         return COR_RESTO;
     }
 
-    // desenha a legenda no canto inferior
     private void desenharLegenda(Graphics2D g2) {
         int legendaY = getPreferredSize().height - 35;
         int x = 20;

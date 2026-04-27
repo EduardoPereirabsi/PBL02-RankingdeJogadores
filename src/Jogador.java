@@ -1,5 +1,3 @@
-// Classe que representa um jogador com nickname e ranking
-// Baseado na estrutura do CSV (nickname, ranking)
 public class Jogador implements Comparable<Jogador> {
     private String nickname;
     private int ranking;
