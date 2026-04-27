@@ -38,11 +38,9 @@ public class RankingGUI extends JFrame {
         row1.add(removeBtn);
 
         JPanel row2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 2));
-        JButton searchRankBtn = createButton("Buscar Ranking", new Color(21, 101, 192));
-        JButton searchNameBtn = createButton("Buscar Nome", new Color(21, 101, 192));
+        JButton searchNameBtn = createButton("Buscar", new Color(21, 101, 192));
         JButton loadCsvBtn   = createButton("Carregar CSV", new Color(56, 142, 60));
         JButton clearBtn     = createButton("Limpar \u00c1rvore", new Color(120, 120, 120));
-        row2.add(searchRankBtn);
         row2.add(searchNameBtn);
         row2.add(loadCsvBtn);
         row2.add(clearBtn);
@@ -90,7 +88,6 @@ public class RankingGUI extends JFrame {
 
         insertBtn.addActionListener(e -> doInsert());
         removeBtn.addActionListener(e -> doRemove());
-        searchRankBtn.addActionListener(e -> doSearchByRanking());
         searchNameBtn.addActionListener(e -> doSearchByName());
         loadCsvBtn.addActionListener(e -> doLoadCSV());
         clearBtn.addActionListener(e -> doClear());
@@ -130,7 +127,7 @@ public class RankingGUI extends JFrame {
                 log("[AVISO] Ranking deve ser maior que 0.");
                 return;
             }
-            if (bst.search(rank) != null) {
+            if (bst.getPlayerByRanking(rank) != null) {
                 log("[AVISO] Ranking #" + rank + " j\u00e1 existe na \u00e1rvore.");
                 return;
             }
@@ -145,52 +142,18 @@ public class RankingGUI extends JFrame {
     }
 
     private void doRemove() {
-        String rankStr = rankingField.getText().trim();
-        if (rankStr.isEmpty()) {
-            log("[AVISO] Informe o ranking para remover.");
+        String nick = nicknameField.getText().trim();
+        if (nick.isEmpty()) {
+            log("[AVISO] Informe o nickname para remover.");
             return;
         }
-        try {
-            int rank = Integer.parseInt(rankStr);
-            Player p = bst.search(rank);
-            if (bst.remove(rank)) {
-                log("[OK] Removido: " + p);
-                treePanel.clearHighlight();
-                refreshTree();
-            } else {
-                log("[AVISO] Ranking #" + rank + " n\u00e3o encontrado.");
-            }
-        } catch (NumberFormatException ex) {
-            log("[AVISO] Ranking inv\u00e1lido.");
-        }
-    }
-
-    private void doSearchByRanking() {
-        String rankStr = rankingField.getText().trim();
-        if (rankStr.isEmpty()) {
-            log("[AVISO] Informe o ranking para buscar.");
-            return;
-        }
-        try {
-            int rank = Integer.parseInt(rankStr);
-            Player found = bst.search(rank);
-            if (found != null) {
-                log("[BUSCA] Encontrado: " + found);
-                treePanel.setHighlight(rank);
-
-                Player[] path = bst.getSearchPath(rank);
-                StringBuilder sb = new StringBuilder("   Caminho: ");
-                for (int i = 0; i < path.length; i++) {
-                    if (i > 0) sb.append(" -> ");
-                    sb.append(path[i]);
-                }
-                log(sb.toString());
-            } else {
-                log("[BUSCA] Ranking #" + rank + " n\u00e3o encontrado.");
-                treePanel.clearHighlight();
-            }
-        } catch (NumberFormatException ex) {
-            log("[AVISO] Ranking inv\u00e1lido.");
+        Player removed = bst.remove(nick);
+        if (removed != null) {
+            log("[OK] Removido: " + removed);
+            treePanel.clearHighlight();
+            refreshTree();
+        } else {
+            log("[AVISO] '" + nick + "' n\u00e3o encontrado.");
         }
     }
 
@@ -200,14 +163,23 @@ public class RankingGUI extends JFrame {
             log("[AVISO] Informe o nickname para buscar.");
             return;
         }
-        Player found = bst.searchByNickname(nick);
-        if (found != null) {
-            log("[BUSCA] Encontrado: " + found);
-            treePanel.setHighlight(found.getRanking());
+        if (bst.search(nick)) {
+            Node found = bst.getRoot();
+            Player player = findPlayerByName(found, nick);
+            log("[BUSCA] Encontrado: " + player);
+            treePanel.setHighlight(player.getRanking());
         } else {
             log("[BUSCA] '" + nick + "' n\u00e3o encontrado.");
             treePanel.clearHighlight();
         }
+    }
+
+    private Player findPlayerByName(Node node, String name) {
+        if (node == null) return null;
+        if (node.player.getNickname().equalsIgnoreCase(name)) return node.player;
+        Player found = findPlayerByName(node.left, name);
+        if (found != null) return found;
+        return findPlayerByName(node.right, name);
     }
 
     private void doLoadCSV() {
@@ -227,7 +199,7 @@ public class RankingGUI extends JFrame {
                 if (parts.length >= 2) {
                     String nick = parts[0].trim();
                     int rank = Integer.parseInt(parts[1].trim());
-                    if (bst.search(rank) == null) {
+                    if (bst.getPlayerByRanking(rank) == null) {
                         bst.insert(new Player(nick, rank));
                         count++;
                     }

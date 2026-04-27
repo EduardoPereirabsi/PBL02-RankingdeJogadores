@@ -7,45 +7,70 @@ public class BinarySearchTree {
         size = 0;
     }
 
-    public boolean insert(Player player) {
-        if (search(player.getRanking()) != null) return false;
-        root = insertRec(root, player);
+    public void insert(Player player) {
+        if (searchByRanking(root, player.getRanking()) != null) return;
+        root = insert(root, player);
         size++;
-        return true;
     }
 
-    private Node insertRec(Node node, Player player) {
-        if (node == null) return new Node(player);
-
-        if (player.getRanking() < node.player.getRanking()) {
-            node.left = insertRec(node.left, player);
-        } else if (player.getRanking() > node.player.getRanking()) {
-            node.right = insertRec(node.right, player);
+    private Node insert(Node current, Player player) {
+        if (current == null) return new Node(player);
+        if (player.getRanking() < current.player.getRanking()) {
+            current.left = insert(current.left, player);
+        } else if (player.getRanking() > current.player.getRanking()) {
+            current.right = insert(current.right, player);
         }
-        return node;
+        return current;
     }
 
-    public boolean remove(int ranking) {
-        if (search(ranking) == null) return false;
-        root = removeRec(root, ranking);
+    public boolean search(String name) {
+        return search(root, name) != null;
+    }
+
+    private Node search(Node current, String name) {
+        if (current == null) return null;
+        if (current.player.getNickname().equalsIgnoreCase(name)) return current;
+        Node found = search(current.left, name);
+        if (found != null) return found;
+        return search(current.right, name);
+    }
+
+    public Player remove(String name) {
+        Node found = search(root, name);
+        if (found == null) return null;
+        Player removed = found.player;
+        root = remove(root, name);
         size--;
-        return true;
+        return removed;
     }
 
-    private Node removeRec(Node node, int ranking) {
-        if (node == null) return null;
+    private Node remove(Node current, String name) {
+        if (current == null) return null;
+        if (current.player.getNickname().equalsIgnoreCase(name)) {
+            if (current.left == null) return current.right;
+            if (current.right == null) return current.left;
+            Node successor = findMinNode(current.right);
+            current.player = successor.player;
+            current.right = removeByRanking(current.right, successor.player.getRanking());
+            return current;
+        }
+        current.left = remove(current.left, name);
+        current.right = remove(current.right, name);
+        return current;
+    }
 
+    private Node removeByRanking(Node node, int ranking) {
+        if (node == null) return null;
         if (ranking < node.player.getRanking()) {
-            node.left = removeRec(node.left, ranking);
+            node.left = removeByRanking(node.left, ranking);
         } else if (ranking > node.player.getRanking()) {
-            node.right = removeRec(node.right, ranking);
+            node.right = removeByRanking(node.right, ranking);
         } else {
             if (node.left == null) return node.right;
             if (node.right == null) return node.left;
-
             Node successor = findMinNode(node.right);
             node.player = successor.player;
-            node.right = removeRec(node.right, successor.player.getRanking());
+            node.right = removeByRanking(node.right, successor.player.getRanking());
         }
         return node;
     }
@@ -55,28 +80,16 @@ public class BinarySearchTree {
         return node;
     }
 
-    public Player search(int ranking) {
-        Node result = searchRec(root, ranking);
-        return result != null ? result.player : null;
-    }
-
-    private Node searchRec(Node node, int ranking) {
+    private Node searchByRanking(Node node, int ranking) {
         if (node == null) return null;
         if (ranking == node.player.getRanking()) return node;
-        if (ranking < node.player.getRanking()) return searchRec(node.left, ranking);
-        return searchRec(node.right, ranking);
+        if (ranking < node.player.getRanking()) return searchByRanking(node.left, ranking);
+        return searchByRanking(node.right, ranking);
     }
 
-    public Player searchByNickname(String nickname) {
-        return searchByNicknameRec(root, nickname);
-    }
-
-    private Player searchByNicknameRec(Node node, String nickname) {
-        if (node == null) return null;
-        if (node.player.getNickname().equalsIgnoreCase(nickname)) return node.player;
-        Player found = searchByNicknameRec(node.left, nickname);
-        if (found != null) return found;
-        return searchByNicknameRec(node.right, nickname);
+    public Player getPlayerByRanking(int ranking) {
+        Node result = searchByRanking(root, ranking);
+        return result != null ? result.player : null;
     }
 
     public Player[] getSearchPath(int ranking) {

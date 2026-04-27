@@ -163,21 +163,21 @@ public class TreePanel extends JPanel {
         g2.draw(rect);
 
         g2.setColor(hl ? Color.BLACK : Color.WHITE);
-        g2.setFont(new Font("SansSerif", Font.BOLD, 12));
-        String rankStr = "#" + node.player.getRanking();
-        FontMetrics fm = g2.getFontMetrics();
-        g2.drawString(rankStr, pos.x - fm.stringWidth(rankStr) / 2, y + 16);
-
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 9));
-        fm = g2.getFontMetrics();
+        g2.setFont(new Font("SansSerif", Font.BOLD, 11));
         String nick = node.player.getNickname();
+        FontMetrics fm = g2.getFontMetrics();
         if (fm.stringWidth(nick) > NODE_W - 8) {
             while (nick.length() > 3 && fm.stringWidth(nick + "..") > NODE_W - 8) {
                 nick = nick.substring(0, nick.length() - 1);
             }
             nick += "..";
         }
-        g2.drawString(nick, pos.x - fm.stringWidth(nick) / 2, y + 32);
+        g2.drawString(nick, pos.x - fm.stringWidth(nick) / 2, y + 16);
+
+        g2.setFont(new Font("SansSerif", Font.PLAIN, 9));
+        fm = g2.getFontMetrics();
+        String rankStr = "#" + node.player.getRanking();
+        g2.drawString(rankStr, pos.x - fm.stringWidth(rankStr) / 2, y + 32);
     }
 
     private Color getNodeColor(int rank, boolean highlight) {
