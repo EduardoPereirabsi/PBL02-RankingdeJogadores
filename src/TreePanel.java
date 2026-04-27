@@ -1,13 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TreePanel extends JPanel {
     private final BinarySearchTree bst;
     private int highlightRanking = -1;
-    private final Map<Node, Point> positions = new HashMap<>();
+    private Node[] nodesArray = new Node[0];
+    private Point[] pointsArray = new Point[0];
+    private int posCount = 0;
 
     private static final int NODE_W = 92;
     private static final int NODE_H = 42;
@@ -47,8 +47,18 @@ public class TreePanel extends JPanel {
         repaint();
     }
 
+    private Point getPosition(Node node) {
+        for (int i = 0; i < posCount; i++) {
+            if (nodesArray[i] == node) return pointsArray[i];
+        }
+        return null;
+    }
+
     private void computePositions() {
-        positions.clear();
+        int tam = bst.getSize();
+        nodesArray = new Node[tam];
+        pointsArray = new Point[tam];
+        posCount = 0;
         if (bst.getRoot() == null) return;
         int[] counter = {0};
         inOrderPositions(bst.getRoot(), 0, counter);
@@ -59,7 +69,9 @@ public class TreePanel extends JPanel {
         inOrderPositions(node.left, depth + 1, counter);
         int x = LEFT_MARGIN + counter[0] * (NODE_W + H_GAP) + NODE_W / 2;
         int y = TOP_MARGIN + depth * (NODE_H + V_GAP);
-        positions.put(node, new Point(x, y));
+        nodesArray[posCount] = node;
+        pointsArray[posCount] = new Point(x, y);
+        posCount++;
         counter[0]++;
         inOrderPositions(node.right, depth + 1, counter);
     }
@@ -67,9 +79,10 @@ public class TreePanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         computePositions();
-        if (positions.isEmpty()) return new Dimension(800, 500);
+        if (posCount == 0) return new Dimension(800, 500);
         int maxX = 0, maxY = 0;
-        for (Point p : positions.values()) {
+        for (int i = 0; i < posCount; i++) {
+            Point p = pointsArray[i];
             maxX = Math.max(maxX, p.x + NODE_W / 2 + LEFT_MARGIN);
             maxY = Math.max(maxY, p.y + NODE_H + 60);
         }
@@ -85,7 +98,7 @@ public class TreePanel extends JPanel {
 
         computePositions();
 
-        if (positions.isEmpty()) {
+        if (posCount == 0) {
             g2.setColor(new Color(150, 150, 180));
             g2.setFont(new Font("SansSerif", Font.ITALIC, 16));
             g2.drawString("Árvore vazia — insira jogadores ou carregue o CSV", 200, 250);
@@ -94,8 +107,8 @@ public class TreePanel extends JPanel {
 
         drawEdges(g2, bst.getRoot());
 
-        for (Map.Entry<Node, Point> entry : positions.entrySet()) {
-            drawNode(g2, entry.getKey(), entry.getValue());
+        for (int i = 0; i < posCount; i++) {
+            drawNode(g2, nodesArray[i], pointsArray[i]);
         }
 
         drawLegend(g2);
@@ -103,13 +116,13 @@ public class TreePanel extends JPanel {
 
     private void drawEdges(Graphics2D g2, Node node) {
         if (node == null) return;
-        Point p = positions.get(node);
+        Point p = getPosition(node);
         if (p == null) return;
 
         g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         if (node.left != null) {
-            Point lp = positions.get(node.left);
+            Point lp = getPosition(node.left);
             if (lp != null) {
                 g2.setColor(LINE_COLOR);
                 g2.drawLine(p.x, p.y + NODE_H, lp.x, lp.y);
@@ -117,7 +130,7 @@ public class TreePanel extends JPanel {
             drawEdges(g2, node.left);
         }
         if (node.right != null) {
-            Point rp = positions.get(node.right);
+            Point rp = getPosition(node.right);
             if (rp != null) {
                 g2.setColor(LINE_COLOR);
                 g2.drawLine(p.x, p.y + NODE_H, rp.x, rp.y);

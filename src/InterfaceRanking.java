@@ -2,7 +2,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.io.*;
-import java.util.List;
 
 public class InterfaceRanking extends JFrame {
     private ArvoreBinaria arvore;
@@ -191,11 +190,11 @@ public class InterfaceRanking extends JFrame {
                 escreverSaida("[BUSCA] Encontrado: " + encontrado);
                 painelArvore.destacar(rank);
 
-                List<Jogador> caminho = arvore.getCaminhoBusca(rank);
+                Jogador[] caminho = arvore.getCaminhoBusca(rank);
                 StringBuilder sb = new StringBuilder("   Caminho: ");
-                for (int i = 0; i < caminho.size(); i++) {
+                for (int i = 0; i < caminho.length; i++) {
                     if (i > 0) sb.append(" -> ");
-                    sb.append(caminho.get(i));
+                    sb.append(caminho[i]);
                 }
                 escreverSaida(sb.toString());
 
@@ -271,16 +270,16 @@ public class InterfaceRanking extends JFrame {
         escreverSaida("[OK] Arvore limpa.");
     }
 
-    private void mostrarPercurso(String nome, List<Jogador> lista) {
-        if (lista.isEmpty()) {
+    private void mostrarPercurso(String nome, Jogador[] lista) {
+        if (lista.length == 0) {
             escreverSaida("[AVISO] Arvore vazia.");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("[").append(nome).append("] ").append(lista.size()).append(" jogadores:\n");
-        for (int i = 0; i < lista.size(); i++) {
-            sb.append("   ").append(String.format("%3d", i + 1)).append(". ").append(lista.get(i)).append("\n");
+        sb.append("[").append(nome).append("] ").append(lista.length).append(" jogadores:\n");
+        for (int i = 0; i < lista.length; i++) {
+            sb.append("   ").append(String.format("%3d", i + 1)).append(". ").append(lista[i]).append("\n");
         }
         escreverSaida(sb.toString());
     }

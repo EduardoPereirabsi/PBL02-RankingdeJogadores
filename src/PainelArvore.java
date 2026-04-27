@@ -1,13 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PainelArvore extends JPanel {
     private ArvoreBinaria arvore;
     private int rankingDestacado = -1;
-    private Map<No, Point> posicoes = new HashMap<>();
+    private No[] nosArray = new No[0];
+    private Point[] pontosArray = new Point[0];
+    private int posCount = 0;
 
     private static final int LARGURA_NO = 92;
     private static final int ALTURA_NO = 42;
@@ -47,8 +47,18 @@ public class PainelArvore extends JPanel {
         repaint();
     }
 
+    private Point getPosicao(No node) {
+        for (int i = 0; i < posCount; i++) {
+            if (nosArray[i] == node) return pontosArray[i];
+        }
+        return null;
+    }
+
     private void calcularPosicoes() {
-        posicoes.clear();
+        int tam = arvore.getTamanho();
+        nosArray = new No[tam];
+        pontosArray = new Point[tam];
+        posCount = 0;
         if (arvore.getRoot() == null) return;
         int[] contador = {0};
         percorrerEmOrdem(arvore.getRoot(), 0, contador);
@@ -60,7 +70,9 @@ public class PainelArvore extends JPanel {
 
         int x = MARGEM_ESQ + contador[0] * (LARGURA_NO + ESPACO_H) + LARGURA_NO / 2;
         int y = MARGEM_TOPO + profundidade * (ALTURA_NO + ESPACO_V);
-        posicoes.put(node, new Point(x, y));
+        nosArray[posCount] = node;
+        pontosArray[posCount] = new Point(x, y);
+        posCount++;
         contador[0]++;
 
         percorrerEmOrdem(node.right, profundidade + 1, contador);
@@ -69,12 +81,13 @@ public class PainelArvore extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         calcularPosicoes();
-        if (posicoes.isEmpty()) {
+        if (posCount == 0) {
             return new Dimension(800, 500);
         }
         int maxX = 0;
         int maxY = 0;
-        for (Point p : posicoes.values()) {
+        for (int i = 0; i < posCount; i++) {
+            Point p = pontosArray[i];
             if (p.x + LARGURA_NO / 2 + MARGEM_ESQ > maxX)
                 maxX = p.x + LARGURA_NO / 2 + MARGEM_ESQ;
             if (p.y + ALTURA_NO + 60 > maxY)
@@ -92,7 +105,7 @@ public class PainelArvore extends JPanel {
 
         calcularPosicoes();
 
-        if (posicoes.isEmpty()) {
+        if (posCount == 0) {
             g2.setColor(new Color(150, 150, 180));
             g2.setFont(new Font("SansSerif", Font.ITALIC, 16));
             g2.drawString("Arvore vazia - insira jogadores ou carregue o CSV", 200, 250);
@@ -101,8 +114,8 @@ public class PainelArvore extends JPanel {
 
         desenharLinhas(g2, arvore.getRoot());
 
-        for (Map.Entry<No, Point> entrada : posicoes.entrySet()) {
-            desenharNo(g2, entrada.getKey(), entrada.getValue());
+        for (int i = 0; i < posCount; i++) {
+            desenharNo(g2, nosArray[i], pontosArray[i]);
         }
 
         desenharLegenda(g2);
@@ -110,13 +123,13 @@ public class PainelArvore extends JPanel {
 
     private void desenharLinhas(Graphics2D g2, No node) {
         if (node == null) return;
-        Point posicaoPai = posicoes.get(node);
+        Point posicaoPai = getPosicao(node);
         if (posicaoPai == null) return;
 
         g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         if (node.left != null) {
-            Point posFilho = posicoes.get(node.left);
+            Point posFilho = getPosicao(node.left);
             if (posFilho != null) {
                 g2.setColor(COR_LINHA);
                 g2.drawLine(posicaoPai.x, posicaoPai.y + ALTURA_NO, posFilho.x, posFilho.y);
@@ -125,7 +138,7 @@ public class PainelArvore extends JPanel {
         }
 
         if (node.right != null) {
-            Point posFilho = posicoes.get(node.right);
+            Point posFilho = getPosicao(node.right);
             if (posFilho != null) {
                 g2.setColor(COR_LINHA);
                 g2.drawLine(posicaoPai.x, posicaoPai.y + ALTURA_NO, posFilho.x, posFilho.y);

@@ -2,7 +2,6 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.io.*;
-import java.util.List;
 
 public class RankingGUI extends JFrame {
     private final BinarySearchTree bst;
@@ -179,11 +178,11 @@ public class RankingGUI extends JFrame {
                 log("[BUSCA] Encontrado: " + found);
                 treePanel.setHighlight(rank);
 
-                List<Player> path = bst.getSearchPath(rank);
+                Player[] path = bst.getSearchPath(rank);
                 StringBuilder sb = new StringBuilder("   Caminho: ");
-                for (int i = 0; i < path.size(); i++) {
+                for (int i = 0; i < path.length; i++) {
                     if (i > 0) sb.append(" -> ");
-                    sb.append(path.get(i));
+                    sb.append(path[i]);
                 }
                 log(sb.toString());
             } else {
@@ -248,15 +247,15 @@ public class RankingGUI extends JFrame {
         log("[OK] \u00c1rvore limpa.");
     }
 
-    private void showTraversal(String name, List<Player> list) {
-        if (list.isEmpty()) {
+    private void showTraversal(String name, Player[] list) {
+        if (list.length == 0) {
             log("[AVISO] \u00c1rvore vazia.");
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("[").append(name).append("] ").append(list.size()).append(" jogadores:\n");
-        for (int i = 0; i < list.size(); i++) {
-            sb.append("   ").append(String.format("%3d", i + 1)).append(". ").append(list.get(i)).append("\n");
+        sb.append("[").append(name).append("] ").append(list.length).append(" jogadores:\n");
+        for (int i = 0; i < list.length; i++) {
+            sb.append("   ").append(String.format("%3d", i + 1)).append(". ").append(list[i]).append("\n");
         }
         log(sb.toString());
     }

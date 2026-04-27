@@ -1,8 +1,3 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 public class ArvoreBinaria {
     private No root;
     private int tamanho;
@@ -96,73 +91,81 @@ public class ArvoreBinaria {
         return buscarPorNicknameRec(node.right, nickname);
     }
 
-    public List<Jogador> getCaminhoBusca(int ranking) {
-        List<Jogador> caminho = new ArrayList<>();
-        percorrerCaminho(root, ranking, caminho);
-        return caminho;
+    public Jogador[] getCaminhoBusca(int ranking) {
+        Jogador[] temp = new Jogador[getHeight()];
+        int[] idx = {0};
+        percorrerCaminho(root, ranking, temp, idx);
+        Jogador[] resultado = new Jogador[idx[0]];
+        for (int i = 0; i < idx[0]; i++) resultado[i] = temp[i];
+        return resultado;
     }
 
-    private boolean percorrerCaminho(No node, int ranking, List<Jogador> caminho) {
+    private boolean percorrerCaminho(No node, int ranking, Jogador[] caminho, int[] idx) {
         if (node == null) return false;
-        caminho.add(node.jogador);
+        caminho[idx[0]++] = node.jogador;
         if (ranking == node.jogador.getRanking()) return true;
-        if (ranking < node.jogador.getRanking()) return percorrerCaminho(node.left, ranking, caminho);
-        return percorrerCaminho(node.right, ranking, caminho);
+        if (ranking < node.jogador.getRanking()) return percorrerCaminho(node.left, ranking, caminho, idx);
+        return percorrerCaminho(node.right, ranking, caminho, idx);
     }
 
-    public List<Jogador> emOrdem() {
-        List<Jogador> lista = new ArrayList<>();
-        emOrdemRec(root, lista);
-        return lista;
+    public Jogador[] emOrdem() {
+        Jogador[] resultado = new Jogador[tamanho];
+        int[] idx = {0};
+        emOrdemRec(root, resultado, idx);
+        return resultado;
     }
 
-    private void emOrdemRec(No node, List<Jogador> lista) {
+    private void emOrdemRec(No node, Jogador[] resultado, int[] idx) {
         if (node == null) return;
-        emOrdemRec(node.left, lista);
-        lista.add(node.jogador);
-        emOrdemRec(node.right, lista);
+        emOrdemRec(node.left, resultado, idx);
+        resultado[idx[0]++] = node.jogador;
+        emOrdemRec(node.right, resultado, idx);
     }
 
-    public List<Jogador> preOrdem() {
-        List<Jogador> lista = new ArrayList<>();
-        preOrdemRec(root, lista);
-        return lista;
+    public Jogador[] preOrdem() {
+        Jogador[] resultado = new Jogador[tamanho];
+        int[] idx = {0};
+        preOrdemRec(root, resultado, idx);
+        return resultado;
     }
 
-    private void preOrdemRec(No node, List<Jogador> lista) {
+    private void preOrdemRec(No node, Jogador[] resultado, int[] idx) {
         if (node == null) return;
-        lista.add(node.jogador);
-        preOrdemRec(node.left, lista);
-        preOrdemRec(node.right, lista);
+        resultado[idx[0]++] = node.jogador;
+        preOrdemRec(node.left, resultado, idx);
+        preOrdemRec(node.right, resultado, idx);
     }
 
-    public List<Jogador> posOrdem() {
-        List<Jogador> lista = new ArrayList<>();
-        posOrdemRec(root, lista);
-        return lista;
+    public Jogador[] posOrdem() {
+        Jogador[] resultado = new Jogador[tamanho];
+        int[] idx = {0};
+        posOrdemRec(root, resultado, idx);
+        return resultado;
     }
 
-    private void posOrdemRec(No node, List<Jogador> lista) {
+    private void posOrdemRec(No node, Jogador[] resultado, int[] idx) {
         if (node == null) return;
-        posOrdemRec(node.left, lista);
-        posOrdemRec(node.right, lista);
-        lista.add(node.jogador);
+        posOrdemRec(node.left, resultado, idx);
+        posOrdemRec(node.right, resultado, idx);
+        resultado[idx[0]++] = node.jogador;
     }
 
-    public List<Jogador> emNivel() {
-        List<Jogador> lista = new ArrayList<>();
-        if (root == null) return lista;
+    public Jogador[] emNivel() {
+        Jogador[] resultado = new Jogador[tamanho];
+        if (root == null) return resultado;
 
-        Queue<No> fila = new LinkedList<>();
-        fila.add(root);
+        No[] fila = new No[tamanho];
+        int inicio = 0, fim = 0;
+        fila[fim++] = root;
+        int idx = 0;
 
-        while (!fila.isEmpty()) {
-            No atual = fila.poll();
-            lista.add(atual.jogador);
-            if (atual.left != null) fila.add(atual.left);
-            if (atual.right != null) fila.add(atual.right);
+        while (inicio < fim) {
+            No atual = fila[inicio++];
+            resultado[idx++] = atual.jogador;
+            if (atual.left != null) fila[fim++] = atual.left;
+            if (atual.right != null) fila[fim++] = atual.right;
         }
-        return lista;
+        return resultado;
     }
 
     public int getHeight() {

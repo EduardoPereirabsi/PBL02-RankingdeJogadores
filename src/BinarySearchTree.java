@@ -1,8 +1,3 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
 public class BinarySearchTree {
     private Node root;
     private int size;
@@ -84,71 +79,79 @@ public class BinarySearchTree {
         return searchByNicknameRec(node.right, nickname);
     }
 
-    public List<Player> getSearchPath(int ranking) {
-        List<Player> path = new ArrayList<>();
-        searchPath(root, ranking, path);
-        return path;
+    public Player[] getSearchPath(int ranking) {
+        Player[] temp = new Player[getHeight()];
+        int[] idx = {0};
+        searchPath(root, ranking, temp, idx);
+        Player[] resultado = new Player[idx[0]];
+        for (int i = 0; i < idx[0]; i++) resultado[i] = temp[i];
+        return resultado;
     }
 
-    private boolean searchPath(Node node, int ranking, List<Player> path) {
+    private boolean searchPath(Node node, int ranking, Player[] path, int[] idx) {
         if (node == null) return false;
-        path.add(node.player);
+        path[idx[0]++] = node.player;
         if (ranking == node.player.getRanking()) return true;
-        if (ranking < node.player.getRanking()) return searchPath(node.left, ranking, path);
-        return searchPath(node.right, ranking, path);
+        if (ranking < node.player.getRanking()) return searchPath(node.left, ranking, path, idx);
+        return searchPath(node.right, ranking, path, idx);
     }
 
-    public List<Player> inOrder() {
-        List<Player> result = new ArrayList<>();
-        inOrderRec(root, result);
-        return result;
+    public Player[] inOrder() {
+        Player[] resultado = new Player[size];
+        int[] idx = {0};
+        inOrderRec(root, resultado, idx);
+        return resultado;
     }
 
-    private void inOrderRec(Node node, List<Player> result) {
+    private void inOrderRec(Node node, Player[] resultado, int[] idx) {
         if (node == null) return;
-        inOrderRec(node.left, result);
-        result.add(node.player);
-        inOrderRec(node.right, result);
+        inOrderRec(node.left, resultado, idx);
+        resultado[idx[0]++] = node.player;
+        inOrderRec(node.right, resultado, idx);
     }
 
-    public List<Player> preOrder() {
-        List<Player> result = new ArrayList<>();
-        preOrderRec(root, result);
-        return result;
+    public Player[] preOrder() {
+        Player[] resultado = new Player[size];
+        int[] idx = {0};
+        preOrderRec(root, resultado, idx);
+        return resultado;
     }
 
-    private void preOrderRec(Node node, List<Player> result) {
+    private void preOrderRec(Node node, Player[] resultado, int[] idx) {
         if (node == null) return;
-        result.add(node.player);
-        preOrderRec(node.left, result);
-        preOrderRec(node.right, result);
+        resultado[idx[0]++] = node.player;
+        preOrderRec(node.left, resultado, idx);
+        preOrderRec(node.right, resultado, idx);
     }
 
-    public List<Player> postOrder() {
-        List<Player> result = new ArrayList<>();
-        postOrderRec(root, result);
-        return result;
+    public Player[] postOrder() {
+        Player[] resultado = new Player[size];
+        int[] idx = {0};
+        postOrderRec(root, resultado, idx);
+        return resultado;
     }
 
-    private void postOrderRec(Node node, List<Player> result) {
+    private void postOrderRec(Node node, Player[] resultado, int[] idx) {
         if (node == null) return;
-        postOrderRec(node.left, result);
-        postOrderRec(node.right, result);
-        result.add(node.player);
+        postOrderRec(node.left, resultado, idx);
+        postOrderRec(node.right, resultado, idx);
+        resultado[idx[0]++] = node.player;
     }
 
-    public List<Player> levelOrder() {
-        List<Player> result = new ArrayList<>();
-        if (root == null) return result;
-        Queue<Node> queue = new LinkedList<>();
-        queue.add(root);
-        while (!queue.isEmpty()) {
-            Node current = queue.poll();
-            result.add(current.player);
-            if (current.left != null) queue.add(current.left);
-            if (current.right != null) queue.add(current.right);
+    public Player[] levelOrder() {
+        Player[] resultado = new Player[size];
+        if (root == null) return resultado;
+        Node[] fila = new Node[size];
+        int inicio = 0, fim = 0;
+        fila[fim++] = root;
+        int idx = 0;
+        while (inicio < fim) {
+            Node atual = fila[inicio++];
+            resultado[idx++] = atual.player;
+            if (atual.left != null) fila[fim++] = atual.left;
+            if (atual.right != null) fila[fim++] = atual.right;
         }
-        return result;
+        return resultado;
     }
 
     public int getHeight() {
